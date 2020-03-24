@@ -7,4 +7,5 @@ module.exports = () => {
 	mongoose.connection.on("error",(error) => {
 		console.log("Veritabanı bağlantısı başarısız. Hata : ",error);
 	});
+	mongoose.Promise = global.Promise;
 };
