@@ -5,7 +5,7 @@ const movieSchema = new Schema({
 	title:{
 		type: String,
 		required: true,
-		unique: [true,"Aynı isimde filmler kayıt edilemez, {VALUE} adında bir film kayıtlıdır."]
+		unique: true
 	},
 	category: String,
 	country: String,

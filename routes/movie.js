@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
@@ -27,9 +28,27 @@ router.get('/top10',(req,res,next) => {
 	});
 });
 router.get('/', (req, res, next) => {
-	const promise = Movie.find({});
+	const promise = Movie.aggregate([
+	{
+		$lookup : {
+			from: 'directors',
+			localField: 'director_id',
+			foreignField: '_id',
+			as: 'director'
+		}
+	},
+	{
+		$unwind: {
+			path: "$director",
+			preserveNullAndEmptyArrays: true
+		}
+	}
+	]);
 	promise.then((data) => {
-		res.json(data);
+		if (!data)
+			res.send("Film bulunamadı!");
+		else
+			res.json(data);
 	}).catch((error) => {
 		res.json(error);
 	});
@@ -40,7 +59,7 @@ router.post('/',(req,res,next) => {
 
 	const promise = createMovie.save();
 	promise.then((data) => {
-		res.json(`${title} adlı film başarıyla kayıt edildi.`);
+		res.json(data);
 	}).catch((error) => {
 		res.json(error);
 	});
@@ -51,7 +70,7 @@ router.delete('/:movie_id',(req,res,next) => {
 		if (!data)
 			next({message:"Film bulunamadı!",code:21});
 		else
-			res.send("Film silme işlemi başarılı");
+			res.json({status:1});
 	}).catch((error) => {
 		res.json(error);
 	});

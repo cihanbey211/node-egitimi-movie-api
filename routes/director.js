@@ -10,7 +10,7 @@ router.post('/',(req,res,next) => {
 	const promise = createDirector.save();
 	promise.then((data) => {
 		if (!data)
-			res.json({message: "Ekleme işlemi başarısız", code:23});
+			next({message: "Ekleme işlemi başarısız", code:23});
 		else
 			res.json(data);
 	}).catch((error) => {
@@ -59,7 +59,7 @@ router.get('/:director_id',(req,res,next) => {
 	]).allowDiskUse(true);
 	promise.then((data) => {
 		if(!data)
-			res.json({message:"Yönetmen bulunamadı", code:18});
+			next({message:"Yönetmen bulunamadı", code:18});
 		else
 			res.json(data);
 	}).catch((error) => {
@@ -101,16 +101,42 @@ router.get('/',(req,res,next) => {
 			surname: '$_id.surname',
 			movies: '$movies'
 		}
+	},
+	{
+		$sort: {
+			name: 1
+		}
 	}
 	]).allowDiskUse(true);
 	promise.then((data) => {
 		if (!data)
-			res.json({message:"Yönetmen bulunamadı!",code:24});
+			next({message:"Yönetmen bulunamadı!",code:24});
 		else
 			res.json(data);
 	}).catch((error) => {
 		res.json(error);
 	});
 });
-
+router.put('/:director_id',(req,res,next) => {
+	const promise = Director.findByIdAndUpdate(req.params.director_id,req.body,{new: true});
+	promise.then((data) => {
+		if (!data)
+			next({message:"Yönetmen bulunamadı!",code:22});
+		else
+			res.json(data);
+	}).catch((error) => {
+		res.json(error);
+	});
+});
+router.delete('/:director_id',(req,res,next) => {
+	const promise = Director.findByIdAndRemove(req.params.director_id);
+	promise.then((data) => {
+		if (!data)
+			next({message: "Yönetmen bulunamadı!",code:22});
+		else
+			res.json({message: "İşlem başarıyla gerçekleştirildi",code:26});
+	}).catch((error) => {
+		res.json(error);
+	});
+});
 module.exports = router;
